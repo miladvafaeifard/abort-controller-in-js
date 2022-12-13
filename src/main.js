@@ -21,23 +21,22 @@ async function fetchVideo() {
   downloadBtn.classList.add('hidden');
   abortBtn.classList.remove('hidden');
   reports.textContent = 'Video awaiting download...';
-
   try {
-  const response = await fetch(url, { signal });
-  if (response.status === 200) {
-    const videoBlob = await response.blob();
-    const video = document.createElement('video');
-    video.setAttribute('controls', '');
-    video.src = URL.createObjectURL(videoBlob);
-    videoWrapper.appendChild(video);
-    videoWrapper.classList.remove('hidden');
-    abortBtn.classList.add('hidden');
-    downloadBtn.classList.add('hidden');
-    reports.textContent = 'Video ready to play';
-    signal.aborted || signal?.removeEventListener('abort', () => {});
-  } else {
-    throw new Error('Failed to fetch');
-  }
+    const response = await fetch(url, { signal });
+    if (response.status === 200) {
+      const videoBlob = await response.blob();
+      const video = document.createElement('video');
+      video.setAttribute('controls', '');
+      video.src = URL.createObjectURL(videoBlob);
+      videoWrapper.appendChild(video);
+      videoWrapper.classList.remove('hidden');
+      abortBtn.classList.add('hidden');
+      downloadBtn.classList.add('hidden');
+      reports.textContent = 'Video ready to play';
+      signal.aborted || signal?.removeEventListener('abort', () => {});
+    } else {
+      throw new Error('Failed to fetch');
+    }
   } catch (e) {
     signal.aborted || signal?.removeEventListener('abort', () => {});
     abortBtn.classList.add('hidden');
@@ -52,10 +51,18 @@ async function fetchVideo() {
 function runAnimation() {
   progressAnimation = setInterval(() => {
     switch (animationCount++ & 3) {
-      case 0: reports.textContent = 'Downloading.'; break;
-      case 1: reports.textContent = 'Downloading..'; break;
-      case 2: reports.textContent = 'Downloading...'; break;
-      case 3: reports.textContent = 'Downloading....'; break;
+      case 0:
+        reports.textContent = 'Downloading.';
+        break;
+      case 1:
+        reports.textContent = 'Downloading..';
+        break;
+      case 2:
+        reports.textContent = 'Downloading...';
+        break;
+      case 3:
+        reports.textContent = 'Downloading....';
+        break;
     }
   }, 300);
 }

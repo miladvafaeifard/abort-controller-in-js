@@ -15,53 +15,38 @@ function abortDownload() {
   downloadBtn.classList.remove('hidden');
 }
 
-function fetchVideo() {
+async function fetchVideo() {
   controller = new AbortController();
   const signal = controller.signal;
   downloadBtn.classList.add('hidden');
   abortBtn.classList.remove('hidden');
   reports.textContent = 'Video awaiting download...';
 
-  fetch(url, { signal })
-    .then((response) => {
-      let timeout;
-      if (response.status === 200) {
-        return new Promise((resolve, reject) => {
-          runAnimation();
-          signal.aborted ||
-            signal?.addEventListener('abort', () => {
-              clearInterval(timeout);
-              reject(new DOMException('Aborted', 'AbortError'));
-            });
-          timeout = setTimeout(() => resolve(response.blob()), 2000);
-        });
-      } else {
-        throw new Error('Failed to fetch');
-      }
-    })
-    .then((videoBlob) => {
-      const video = document.createElement('video');
-      video.setAttribute('controls', '');
-      video.src = URL.createObjectURL(videoBlob);
-      videoWrapper.appendChild(video);
-
-      videoWrapper.classList.remove('hidden');
-      abortBtn.classList.add('hidden');
-      downloadBtn.classList.add('hidden');
-
-      reports.textContent = 'Video ready to play';
-      signal.aborted || signal?.removeEventListener('abort', () => {});
-    })
-    .catch((e) => {
-      signal.aborted || signal?.removeEventListener('abort', () => {});
-      abortBtn.classList.add('hidden');
-      downloadBtn.classList.remove('hidden');
-      reports.textContent = 'Download error: ' + e.message;
-    })
-    .finally(() => {
-      clearInterval(progressAnimation);
-      animationCount = 0;
-    });
+  try {
+  const response = await fetch(url, { signal });
+  if (response.status === 200) {
+    const videoBlob = await response.blob();
+    const video = document.createElement('video');
+    video.setAttribute('controls', '');
+    video.src = URL.createObjectURL(videoBlob);
+    videoWrapper.appendChild(video);
+    videoWrapper.classList.remove('hidden');
+    abortBtn.classList.add('hidden');
+    downloadBtn.classList.add('hidden');
+    reports.textContent = 'Video ready to play';
+    signal.aborted || signal?.removeEventListener('abort', () => {});
+  } else {
+    throw new Error('Failed to fetch');
+  }
+  } catch (e) {
+    signal.aborted || signal?.removeEventListener('abort', () => {});
+    abortBtn.classList.add('hidden');
+    downloadBtn.classList.remove('hidden');
+    reports.textContent = 'Download error: ' + e.message;
+  } finally {
+    clearInterval(progressAnimation);
+    animationCount = 0;
+  }
 }
 
 function runAnimation() {

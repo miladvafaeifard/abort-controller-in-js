@@ -24,7 +24,7 @@ async function fetchVideo() {
   try {
     const response = await fetch(url, { signal });
     if (response.status === 200) {
-      const videoBlob = await response.blob();
+      const videoBlob = await simulateDelay(response, signal);
       const video = document.createElement('video');
       video.setAttribute('controls', '');
       video.src = URL.createObjectURL(videoBlob);
@@ -33,16 +33,17 @@ async function fetchVideo() {
       abortBtn.classList.add('hidden');
       downloadBtn.classList.add('hidden');
       reports.textContent = 'Video ready to play';
-      signal.aborted || signal?.removeEventListener('abort', () => {});
+      removeAbortSignal(signal);
     } else {
       throw new Error('Failed to fetch');
     }
   } catch (e) {
-    signal.aborted || signal?.removeEventListener('abort', () => {});
+    removeAbortSignal(signal);
     abortBtn.classList.add('hidden');
     downloadBtn.classList.remove('hidden');
     reports.textContent = 'Download error: ' + e.message;
   } finally {
+    removeAbortSignal(signal);
     clearInterval(progressAnimation);
     animationCount = 0;
   }
@@ -65,4 +66,25 @@ function runAnimation() {
         break;
     }
   }, 300);
+}
+
+function simulateDelay(response, signal) {
+  let timeout;
+  return new Promise((resolve, reject) => {
+    runAnimation();
+    if (!signal.aborted) {
+      signal?.addEventListener(
+        'abort',
+        () => {
+          clearInterval(timeout);
+          reject(new DOMException('Aborted', 'AbortError'));
+        }
+      );
+    }
+    timeout = setTimeout(() => resolve(response.blob()), 2000);
+  });
+}
+
+function removeAbortSignal(signal) {
+  signal.aborted || signal?.removeEventListener('abort', () => {});
 }

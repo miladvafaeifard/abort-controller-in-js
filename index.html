@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Abort Controller</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+  <link rel="manifest" href="images/site.webmanifest">
+  <style>
+    .wrapper {
+      width: 70%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    video {
+      max-width: 100%;
+    }
+
+    .wrapper > div {
+      margin-bottom: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <h1>Video Player</h1>
+    <div class="controls">
+      <button class="download" onclick="fetchVideo()">Download video</button>
+      <button class="abort hidden" onclick="abortDownload()">Cancel download</button>
+      <p class="reports"></p>
+    </div>
+    <div class="videoWrapper hidden"></div>
+  </div>
+  
+  <script src="src/main.js"></script>
+</body>
+</html>

@@ -25,11 +25,7 @@ async function fetchVideo() {
     const response = await fetch(url, { signal });
     if (response.status === 200) {
       const videoBlob = await simulateDelay(response, signal);
-      const video = document.createElement('video');
-      video.setAttribute('controls', '');
-      video.src = URL.createObjectURL(videoBlob);
-      videoWrapper.appendChild(video);
-      videoWrapper.classList.remove('hidden');
+      appendVideo(videoBlob);
       abortBtn.classList.add('hidden');
       downloadBtn.classList.add('hidden');
       reports.textContent = 'Video ready to play';
@@ -87,4 +83,12 @@ function simulateDelay(response, signal) {
 
 function removeAbortSignal(signal) {
   signal.aborted || signal?.removeEventListener('abort', () => {});
+}
+
+function appendVideo(videoBlob) {
+  const video = document.createElement('video');
+  video.setAttribute('controls', '');
+  video.src = URL.createObjectURL(videoBlob);
+  videoWrapper.appendChild(video);
+  videoWrapper.classList.remove('hidden');
 }
